@@ -53,3 +53,4 @@ lib/
 
 .vscode
 reports
+junit.xml
