@@ -155,4 +155,23 @@ describe('recaptcha', () => {
       expect(() => recaptcha.assertLoaded()).not.toThrow()
     })
   })
+
+  describe('When reCaptcha Enterprise selected', () => {
+    it('uses correct grecaptcha property', () => {
+      const recaptchaMock = createMock()
+      const recaptchaEnterpriseMock = createMock()
+
+      const ins = createRecaptcha()
+
+      window.grecaptcha = recaptchaMock
+      window.grecaptcha.enterprise = recaptchaEnterpriseMock
+
+      ins.setEnterprise(true)
+
+      ins.notify()
+      ins.execute(WIDGET_ID)
+      expect(recaptchaEnterpriseMock.execute).toBeCalled()
+      expect(recaptchaMock.execute).not.toBeCalled()
+    })
+  })
 })

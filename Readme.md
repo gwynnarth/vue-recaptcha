@@ -146,6 +146,10 @@ If `loadRecaptchaScript` props is set to `true`, vue-recaptcha will inject the r
 - loadRecaptchaScript (optional)
   If `loadRecaptchaScript` is set to `true`, vue-recaptcha will inject the required `<script>` tag
   Default: `false`
+- enterprise (optional)
+  Whether we should embed and use Enterprise variant of reCAPTCHA.
+  Note that this plugin currently supports either `CHECKBOX` or `INVISIBLE` variants but not `SCORE`.
+  Default: `false`
 
 The following props will only work when `loadRecaptchaScript` is set as `true`
 

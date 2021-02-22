@@ -38,6 +38,10 @@ export default {
       type: String,
       default: '',
     },
+    enterprise: {
+      type: Boolean,
+      default: false,
+    },
   },
   beforeMount() {
     if (this.loadRecaptchaScript) {
@@ -45,12 +49,18 @@ export default {
         // Note: vueRecaptchaApiLoaded load callback name is per the latest documentation
         const script = document.createElement('script')
         script.id = this.recaptchaScriptId
-        script.src = `https://${this.recaptchaHost}/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit&hl=${this.language}`
+        script.src = `https://${this.recaptchaHost}/recaptcha/${
+          this.enterprise ? 'enterprise' : 'api'
+        }.js?onload=vueRecaptchaApiLoaded&render=explicit&hl=${this.language}`
         script.async = true
         script.defer = true
 
         document.head.appendChild(script)
       }
+    }
+
+    if (this.enterprise) {
+      recaptcha.setEnterprise(this.enterprise)
     }
   },
   mounted() {

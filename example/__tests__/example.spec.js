@@ -18,43 +18,49 @@ function createMock() {
   }
 }
 
-describe('Example spec', () => {
+describe.each([[false], [true]])('Example spec', isEnterprise => {
   let wrapper
   let verify
   let expired
+  let mockedGrecaptcha
   beforeEach(() => {
-    window.grecaptcha = createMock()
+    if (isEnterprise) {
+      mockedGrecaptcha = window.grecaptcha.enterprise = createMock()
+    } else {
+      mockedGrecaptcha = window.grecaptcha = createMock()
+    }
+
     verify = jest.fn()
     expired = jest.fn()
     wrapper = mount(VueRecaptcha, {
-      propsData: { sitekey: 'sitekey' },
+      propsData: { sitekey: 'sitekey', enterprise: isEnterprise },
     })
     wrapper.vm.$on('verify', verify)
     wrapper.vm.$on('expired', expired)
   })
 
   it('Should render recaptcha', () => {
-    expect(window.grecaptcha.render).toBeCalled()
+    expect(mockedGrecaptcha.render).toBeCalled()
     expect(wrapper.vm.$widgetId).toBe(WIDGET_ID)
   })
 
   it('Should call execute', () => {
     wrapper.vm.execute()
-    expect(window.grecaptcha.execute).toBeCalledWith(WIDGET_ID)
+    expect(mockedGrecaptcha.execute).toBeCalledWith(WIDGET_ID)
   })
 
   it('Should call reset', () => {
     wrapper.vm.reset()
-    expect(window.grecaptcha.reset).toBeCalledWith(WIDGET_ID)
+    expect(mockedGrecaptcha.reset).toBeCalledWith(WIDGET_ID)
   })
 
   it('Should emit verify', () => {
-    window.grecaptcha._verify()
+    mockedGrecaptcha._verify()
     expect(verify).toBeCalled()
   })
 
   it('Should emit expired', () => {
-    window.grecaptcha._expire()
+    mockedGrecaptcha._expire()
     expect(expired).toBeCalled()
   })
 })

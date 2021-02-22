@@ -11,4 +11,5 @@ export default {
   execute: jest.fn(),
   checkRecaptchaLoad: jest.fn(),
   assertRecaptchaLoad: jest.fn(),
+  setEnterprise: jest.fn(),
 }

@@ -63,6 +63,16 @@
   var ownProp = Object.prototype.hasOwnProperty;
   function createRecaptcha() {
     var deferred = defer();
+    var enterprise = false;
+
+    var getGrecaptchaObject = function getGrecaptchaObject() {
+      if (enterprise) {
+        return window.grecaptcha.enterprise;
+      }
+
+      return window.grecaptcha;
+    };
+
     return {
       notify: function notify() {
         deferred.resolve();
@@ -70,9 +80,12 @@
       wait: function wait() {
         return deferred.promise;
       },
+      setEnterprise: function setEnterprise(isEnterprise) {
+        enterprise = isEnterprise;
+      },
       render: function render(ele, options, cb) {
         this.wait().then(function () {
-          cb(window.grecaptcha.render(ele, options));
+          cb(getGrecaptchaObject().render(ele, options));
         });
       },
       reset: function reset(widgetId) {
@@ -82,7 +95,7 @@
 
         this.assertLoaded();
         this.wait().then(function () {
-          return window.grecaptcha.reset(widgetId);
+          return getGrecaptchaObject().reset(widgetId);
         });
       },
       execute: function execute(widgetId) {
@@ -92,11 +105,11 @@
 
         this.assertLoaded();
         this.wait().then(function () {
-          return window.grecaptcha.execute(widgetId);
+          return getGrecaptchaObject().execute(widgetId);
         });
       },
       checkRecaptchaLoad: function checkRecaptchaLoad() {
-        if (ownProp.call(window, 'grecaptcha') && ownProp.call(window.grecaptcha, 'render')) {
+        if (ownProp.call(window, 'grecaptcha') && ownProp.call(getGrecaptchaObject(), 'render')) {
           this.notify();
         }
       },
@@ -150,6 +163,10 @@
       language: {
         type: String,
         "default": ''
+      },
+      enterprise: {
+        type: Boolean,
+        "default": false
       }
     },
     beforeMount: function beforeMount() {
@@ -158,11 +175,15 @@
           // Note: vueRecaptchaApiLoaded load callback name is per the latest documentation
           var script = document.createElement('script');
           script.id = this.recaptchaScriptId;
-          script.src = "https://" + this.recaptchaHost + "/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit&hl=" + this.language;
+          script.src = "https://" + this.recaptchaHost + "/recaptcha/" + (this.enterprise ? 'enterprise' : 'api') + ".js?onload=vueRecaptchaApiLoaded&render=explicit&hl=" + this.language;
           script.async = true;
           script.defer = true;
           document.head.appendChild(script);
         }
+      }
+
+      if (this.enterprise) {
+        recaptcha.setEnterprise(this.enterprise);
       }
     },
     mounted: function mounted() {

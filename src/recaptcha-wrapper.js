@@ -4,6 +4,15 @@ const ownProp = Object.prototype.hasOwnProperty
 
 export function createRecaptcha() {
   const deferred = defer()
+  let enterprise = false
+
+  const getGrecaptchaObject = () => {
+    if (enterprise) {
+      return window.grecaptcha.enterprise
+    }
+
+    return window.grecaptcha
+  }
 
   return {
     notify() {
@@ -14,9 +23,13 @@ export function createRecaptcha() {
       return deferred.promise
     },
 
+    setEnterprise(isEnterprise) {
+      enterprise = isEnterprise
+    },
+
     render(ele, options, cb) {
       this.wait().then(() => {
-        cb(window.grecaptcha.render(ele, options))
+        cb(getGrecaptchaObject().render(ele, options))
       })
     },
 
@@ -26,7 +39,7 @@ export function createRecaptcha() {
       }
 
       this.assertLoaded()
-      this.wait().then(() => window.grecaptcha.reset(widgetId))
+      this.wait().then(() => getGrecaptchaObject().reset(widgetId))
     },
 
     execute(widgetId) {
@@ -35,11 +48,11 @@ export function createRecaptcha() {
       }
 
       this.assertLoaded()
-      this.wait().then(() => window.grecaptcha.execute(widgetId))
+      this.wait().then(() => getGrecaptchaObject().execute(widgetId))
     },
 
     checkRecaptchaLoad() {
-      if (ownProp.call(window, 'grecaptcha') && ownProp.call(window.grecaptcha, 'render')) {
+      if (ownProp.call(window, 'grecaptcha') && ownProp.call(getGrecaptchaObject(), 'render')) {
         this.notify()
       }
     },

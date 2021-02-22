@@ -48,4 +48,9 @@ describe('Recaptcha', () => {
     })
     expect(document.getElementById(id)).not.toBe(null)
   })
+
+  it('will use Enterprise variant if selected', () => {
+    createWrapper({ sitekey: SITE_KEY, enterprise: true })
+    expect(recaptcha.setEnterprise).toBeCalledWith(true)
+  })
 })

@@ -4,6 +4,7 @@ exports[`Recaptcha Should render ReCAPTCHA: ReCAPTCHA options 1`] = `
 Object {
   "badge": undefined,
   "callback": [Function],
+  "enterprise": false,
   "error-callback": [Function],
   "expired-callback": [Function],
   "language": "",
